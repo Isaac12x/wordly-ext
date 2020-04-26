@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link href="css/tachyons.min.css" rel="stylesheet" />
+    <link href="css/form.css" rel="stylesheet"  />
+    <link href="css/afterLogin.css" rel="stylesheet" />
+</head>
+<body>
+
+<div id="mainPopup" class="" style="width: 300px;">
+  <main class="pa4 black-80">
+    <h1>Hey</h1>
+    <h4>To start adding words to your lexicon first sign in :)</h4>
+    <div id="loader" class="loader hdn">
+      Loading...
+    </div>
+    <form id="loginform" class="measure center">
+      <fieldset id="sign_up" class="ba b--transparent ph0 mh0">
+        <legend class="f4 fw6 ph0 mh0">Sign In</legend>
+        <div class="mt3">
+          <label class="db fw6 lh-copy f6" for="email-address">Email or username</label>
+          <input class="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="text" name="email-address"  id="email-address">
+        </div>
+        <div class="mv3">
+          <label class="db fw6 lh-copy f6" for="password">Password</label>
+          <input class="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100" type="password" name="password"  id="password">
+        </div>
+        <label class="pa0 ma0 lh-copy f6 pointer"><input type="checkbox"> Remember me</label>
+      </fieldset>
+      <div class="">
+        <input class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" type="submit" value="Sign in">
+      </div>
+      <div class="lh-copy mt3">
+        <a href="https://wordsstorer.herokuapp.com" class="f6 link dim black db">No account? Signup now!</a>
+        <a href="#0" class="f6 link dim black db">Forgot your password?</a>
+      </div>
+    </form>
+    <div id="message" class="message hdn">
+      <p class="lh-copy f6 ">
+        Check if Wordly's extension icon has the sign "ON" in green as in the image.
+      </p>
+      <img src="img/logged-in.png" />
+      <p class="lh-copy f6 ">
+        If so you are ready to go. Click the extension icon again.
+      </p>
+      <p class="lh-copy f6 ">Else you can reload the login form: <button class="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib mv3" id="message-button">Reload now</button></p>
+
+    </div>
+  </main>
+
+
+</div>
+<script src="bpopup.js"></script>
+
+</body>
+</html>

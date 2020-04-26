@@ -1,0 +1,15 @@
+.wordlyTag {
+  z-index: 9991291293192391293192 !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: -12px !important;
+}
+
+.wordlyWrapper {
+  background-color: rgba(183, 235, 143, 0.5) !important;
+  border: rgba(183, 235, 143, 1.0) !important;
+}
+
+.wordlyNotification {
+  color: rgba(183, 235, 143, 1.0) !important;
+}
