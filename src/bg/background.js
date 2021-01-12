@@ -1,3 +1,7 @@
+// const host = "https://wordly.mammbo.com/"
+const host = "http://127.0.0.1:8000/";
+
+
 chrome.runtime.onInstalled.addListener(function() {
   chrome.contextMenus.create({
     id: "addToWordly",
@@ -24,52 +28,72 @@ chrome.runtime.onInstalled.addListener(function() {
 //    chrome.tabs.executeScript({
 //      file: "src/cs/contentScript.js"
 //    });
-  }
+//  }
 //});
 
 function msgCallback(result) {
-    console.log("executing message callback");
-    let msg = result;
-    if (typeof result === true) {
-	msg = "success"}
-    else {
-	msg = "failed" }
-    console.log("sending message to tab");
+    let msg = result === true ? "success" : "failed";
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	var activeTab = tabs[0];
-	chrome.tabs.sendMessage(activeTab.id, {"wu982": result})})}
+	      var activeTab = tabs[0];
+	      chrome.tabs.sendMessage(activeTab.id, {"wu982": result, });
+    });
+}
 
 function pushToLexicon(item, callback) {
- // var host = "https://wordsstorer.herokuapp.com/";
-    var host = "http://127.0.0.1:8000/"; 
-  var uri = "api/words/new";
-  chrome.storage.sync.get(["wordstkn", "wordssid"], function(result) {
-    var endpoint = host + uri + "/" + result.wordssid + "/" + item;
-    $.ajax({
-      type: "POST",
-      url: endpoint,
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader("Authorization", `Bearer ${result.wordstkn}`);
-      },
-      contentType: "application/x-www-form-urlencoded",
-      success: function(response) {
-        callback(true);
-        return;
-      },
-      error: function(xhr, status, error) {
-        callback(false);
-        return;
-      }
-    });
+  var uri = "api/words/new/";
+    chrome.storage.sync.get(["wordstkn", "wordssid"], function(result) {
+        var originurl = chrome.tabs.query({active: true, currentWindow: true}, function(tab){
+            try{
+            var endpoint = host + uri +  result.wordssid + "/" +  item + "/";
+            $.ajax({
+                 type: "POST",
+                 url: endpoint,
+                 beforeSend: function(xhr) {
+                     xhr.setRequestHeader("Authorization", `Bearer ${result.wordstkn}`);
+                 },
+                 data: {
+                     "url": tab[0].url ? tab[0] : "n"
+                 },
+                 contentType: "application/x-www-form-urlencoded",
+                success: function(response) {
+
+                    callback(true);
+                     return;
+                 },
+                 error: function(xhr, status, error) {
+                     callback(false);
+                     return;
+                 }
+             })
+            }catch (err) {
+                
+            var endpoint = host+uri+"?qid=" + result.wordssid + "&itm=" + item + "&pu=" + tab[0].url;
+            $.ajax({
+                type: "GET",
+                url: endpoint,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("Authorization", `Bearer ${result.wordstkn}`);
+                },
+                success: function(response) {
+                    callback(true);
+                    return;
+                },
+                error: function(xhr, status, error) {
+                    callback(false);
+                    return;
+                }
+            });
+
+            }
+        })
   });
 }
 
+
 function getUserId(callback) {
-    //  var host = "https://wordsstorer.herokuapp.com/";
-    var host = "http://127.0.0.1:8000/";
   var uri = "api/userid/";
   var endpoint = host + uri;
-
+  
   chrome.storage.sync.get(["wordstkn"], function(result) {
     $.ajax({
       type: "GET",
@@ -112,10 +136,8 @@ function getUserId(callback) {
 }
 
 function makeLogin(user, pass, callback) {
-    //  var host = "https://wordsstorer.herokuapp.com/";
-    var host = "http://127.0.0.1:8000/";
-  var uri = "api/token/";
 
+  var uri = "api/token/";
   var endpoint = host + uri;
 
   $.post(endpoint, { username: user, password: pass }, function(res) {
@@ -132,9 +154,6 @@ function makeLogin(user, pass, callback) {
   });
 }
 
-
-
-
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.action === "login") {
     makeLogin(message.data.user, message.data.password, function(result) {
@@ -147,32 +166,46 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 chrome.contextMenus.onClicked.addListener(function(menuItemId, selectionText) {
   if (menuItemId.menuItemId == "addToWordly") {
-    /// check no errors :)
     var arr = menuItemId.selectionText.split(" ");
     if (
       (menuItemId.selectionText !== "undefined" ||
-        menuItemId.selectionText !== undefined) &&
-      1 >= arr.length <= 3
-    ) {
-	pushToLexicon(menuItemId.selectionText, msgCallback)
-    } else if (arr.length <= 3) {
-      //check if it is a word.
-      /// else error!
-    }
+        menuItemId.selectionText !== undefined) 
+    ) {        
+	      pushToLexicon(menuItemId.selectionText, msgCallback);
+     }
   }
 });
 
-/// Add shortcut command support
-// chrome.commands.onCommand.addListener(function(command,) {
-//   if (command == "send-to-pushToLexicon") {
+/// Add shortcut support
+// chrome.commands.onCommand.addListener(function(command, selectionText) {
+//   if (command == "send-to-pushToLexicon" && (selectionText != "" || selectionText != undefined) {
 //     pushToLexicon()
 //   }
 // })
 
-/// Add Omnibox support
-chrome.omnibox.onInputEntered.addListener(function(text, disposition) {
-  if (text.split(" ") >= 4) {
-  } else {
-    pushToLexicon(menuItemId.text);
-  }
+/// Adds Omnibox support
+chrome.omnibox.onInputEntered.addListener(function(text, disposition, callback) {
+    var check = checkWordBeforeSending(text);
+    if (check === true) {
+        var result = pushToLexicon(text, callback);
+    }
+    /// Add callback response to show on the chrome search bar.
+    /// show result on the chrome bar.
 });
+
+
+function checkWordBeforeSending(text) {
+  if (text.split(" ") >= 4) {
+      return -1;
+  } else {
+      return true;
+  }
+}
+
+function checkLength(words) {
+    if (text.length >= 200) {
+       const text_atoms = text.split(" ");
+       // while () {
+       //     text_atoms.pop()
+   }
+}

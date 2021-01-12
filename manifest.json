@@ -29,8 +29,12 @@
     "content_scripts":[
 	{
 	    "matches": ["*://*/*"],
-	    "js": ["js/jquery/jquery.min.js", "src/cs/contentScript.js"]
+      "css": ["css/display-style.css"],
+	    "js": ["js/jquery/jquery.min.js", "src/cs/contentScript.js", "js/anime.min.js"]
 	}],
+  "web_accessible_resources": [
+        "js/anime.min.js"
+  ],
   "permissions": [
     "activeTab",
     "clipboardRead",
@@ -38,7 +42,7 @@
     "commands",
     "cookies",
     "storage",
-    "https://wordly.mammbo.com/*"
+      "https://wordly.mammbo.com/*"
   ],
   "omnibox": {
     "keyword": "wordly"
@@ -46,7 +50,7 @@
   "commands": {
      "send-to-pushToLexicon": {
        "suggested_key": {
-         "default": "Ctrl+Shift+X"
+         "default": "Ctrl+Shift+L"
        },
        "description": "Save to Wordly",
        "global": true
